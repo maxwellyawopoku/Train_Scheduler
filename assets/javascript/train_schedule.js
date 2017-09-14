@@ -42,11 +42,7 @@ $("#add-train-btn").on("click", function(event) {
   // Uploads train data to the database
   database.ref().push(newtrain);
 
-  // Logs everything to console
-  console.log(newtrain.name);
-  console.log(newtrain.destination);
-  console.log(newtrain.start);
-  console.log(newtrain.freq);
+  
 
   // Alert
   alert("train successfully added");
@@ -76,21 +72,44 @@ database.ref().on("child_added", function(childSnapshot) {
   console.log(trainfreq);
 
   // Prettify the train start
-  var trainStartPretty = moment.unix(trainStart).format("hh:mm");
+  var trainStartPretty = moment(trainStart, "hh:mm").subtract(1, "years");
 
-  // Calculate the months worked using hardcore math
-  // To calculate the months worked
-  var trainMonths = moment().diff(moment.unix(trainStart, "X"), "months");
-  console.log(trainMonths);
 
-  // Calculate the total billed freq
-  var trainBilled = trainMonths * trainfreq;
-  console.log(trainBilled);
+
+
+  // Current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+    // Difference between the times
+    var diffTime = moment().diff(moment(trainStartPretty), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    // Time apart (remainder)
+    var tRemainder = diffTime % trainfreq;
+    console.log(tRemainder);
+
+    // Minute Until Train
+    var tMinutesTillTrain = trainfreq - tRemainder;
+    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    // Next Train
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+    console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+     tNextArrival = moment(nextTrain).format("hh:mm");
+
+  
+
 
   // Add each train's data into the table
   $("#train-table > tbody").append("<tr><td>" + trainName + "</td><td>" + traindestination + "</td><td>" +
-  trainStartPretty + "</td><td>" + trainMonths + "</td><td>" + trainfreq + "</td><td>" + trainBilled + "</td></tr>");
+  trainStart + "</td><td>" + tNextArrival + "</td><td>" + tMinutesTillTrain + "</td></tr>");
 });
+
+document.getElementById("currentDateTime").innerHTML = Date();
+
+
+
 
 // Example Time Math
 // -----------------------------------------------------------------------------
@@ -99,3 +118,5 @@ database.ref().on("child_added", function(childSnapshot) {
 
 // We know that this is 15 months.
 // Now we will create code in moment.js to confirm that any atttraint we use mets this test case
+
+
